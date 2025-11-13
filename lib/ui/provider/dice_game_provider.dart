@@ -7,7 +7,7 @@ class DiceGameProvider extends ChangeNotifier {
   DiceModel currentDice = DiceModel();
   DiceModel oldDice = DiceModel();
   bool isRolling = false;
-  int totalRolls = 8;
+  int totalRolls = 0;
   int rollsDone = 0;
 
   void startRolling() {
