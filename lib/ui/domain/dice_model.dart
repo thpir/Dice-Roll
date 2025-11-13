@@ -22,14 +22,29 @@ class DiceModel {
 
   late String selectedDiceFace;
   late MaterialColor selectedDiceColor;
+  String? impossibleDiceFace;
 
-  DiceModel() {
+  DiceModel({this.impossibleDiceFace}) {
     _initDice();
   }
 
   void _initDice() {
-    final randomDiceIndex = Random().nextInt(DiceModel.diceImages.length);
-    selectedDiceFace = DiceModel.diceImages[randomDiceIndex];
-    selectedDiceColor = DiceModel.diceColors[randomDiceIndex];
+    /// First, create mutable copies of the static lists
+    final availableDiceImages = List<String>.from(diceImages);
+    final availableDiceColors = List<MaterialColor>.from(diceColors);
+
+    // Remove the impossible dice face if specified, ensuring no repetition
+    if (impossibleDiceFace != null) {
+      final unavailableIndex = impossibleDiceFace != null
+        ? diceImages.indexOf(impossibleDiceFace!)
+        : -1;
+      availableDiceImages.removeAt(unavailableIndex);
+      availableDiceColors.removeAt(unavailableIndex);
+    }
+
+    /// Then, randomly select a dice face and color from the available options
+    final randomDiceIndex = Random().nextInt(availableDiceImages.length);
+    selectedDiceFace = availableDiceImages[randomDiceIndex];
+    selectedDiceColor = availableDiceColors[randomDiceIndex];
   }
 }

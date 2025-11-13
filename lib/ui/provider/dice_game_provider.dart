@@ -12,7 +12,8 @@ class DiceGameProvider extends ChangeNotifier {
 
   void startRolling() {
     isRolling = true;
-    totalRolls = Random().nextInt(5) + 8; // Random face updates between 8 and 12
+    /// Random face updates between 8 and 12
+    totalRolls = Random().nextInt(5) + 8;
     updateDice();
   }
 
@@ -23,7 +24,7 @@ class DiceGameProvider extends ChangeNotifier {
 
   void updateDice() {
     oldDice = currentDice;
-    currentDice = DiceModel();
+    currentDice = DiceModel(impossibleDiceFace: oldDice.selectedDiceFace);
     notifyListeners();
   }
 
