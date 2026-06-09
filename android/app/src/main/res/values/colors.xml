@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches AppColors.surface (0xFF141418) so the native splash and the
+         Flutter UI share the same background. -->
+    <color name="splash_bg">#FF141418</color>
+</resources>
