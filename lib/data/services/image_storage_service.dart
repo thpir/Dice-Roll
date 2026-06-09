@@ -11,10 +11,25 @@ class ImageStorageService {
 
   final Uuid _uuid;
 
+  /// Cached application documents directory. Constant for the app's lifetime,
+  /// so once resolved the relative→absolute mapping can be done synchronously
+  /// (see [absolutePathForSync]). Populated by [warmUp] or on first async use.
+  Directory? _docsDir;
+
   ImageStorageService({Uuid? uuid}) : _uuid = uuid ?? const Uuid();
 
+  /// Resolves and caches the documents directory ahead of time so that
+  /// [absolutePathForSync] can serve callers without an await. Safe to call
+  /// repeatedly; only the first call hits the platform channel.
+  Future<void> warmUp() async {
+    _docsDir ??= await getApplicationDocumentsDirectory();
+  }
+
+  Future<Directory> _docs() async =>
+      _docsDir ??= await getApplicationDocumentsDirectory();
+
   Future<Directory> _imagesDir() async {
-    final docs = await getApplicationDocumentsDirectory();
+    final docs = await _docs();
     final dir = Directory('${docs.path}/$_dirName');
     if (!dir.existsSync()) {
       await dir.create(recursive: true);
@@ -51,7 +66,23 @@ class ImageStorageService {
     if (relativePath.startsWith('assets/')) {
       return null;
     }
-    final docs = await getApplicationDocumentsDirectory();
+    final docs = await _docs();
+    return '${docs.path}/$relativePath';
+  }
+
+  /// Synchronous variant of [absolutePathFor]. Returns `null` for asset paths
+  /// (load via [Image.asset]) and also `null` when the documents directory has
+  /// not been cached yet (call [warmUp] first, or fall back to the async
+  /// [absolutePathFor]). Lets hot paths such as the roll animation resolve
+  /// without an await, avoiding per-frame `FutureBuilder` churn.
+  String? absolutePathForSync(String relativePath) {
+    if (relativePath.startsWith('assets/')) {
+      return null;
+    }
+    final docs = _docsDir;
+    if (docs == null) {
+      return null;
+    }
     return '${docs.path}/$relativePath';
   }
 
