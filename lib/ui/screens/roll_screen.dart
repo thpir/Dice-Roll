@@ -4,6 +4,7 @@ import 'package:dice_roll/ui/core/theme/extensions/app_colors_ext.dart';
 import 'package:dice_roll/ui/core/theme/tokens/app_spacing.dart';
 import 'package:dice_roll/ui/core/widgets/buttons/app_icon_button.dart';
 import 'package:dice_roll/ui/core/widgets/buttons/app_primary_button.dart';
+import 'package:dice_roll/ui/core/widgets/dice_face_precache.dart';
 import 'package:dice_roll/ui/core/widgets/display/app_status_dot.dart';
 import 'package:dice_roll/ui/core/widgets/layout/app_app_bar.dart';
 import 'package:dice_roll/ui/core/widgets/layout/app_scaffold.dart';
@@ -14,14 +15,38 @@ import 'package:dice_roll/ui/screens/dice_selector_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class RollScreen extends StatelessWidget {
+class RollScreen extends StatefulWidget {
   static const routeName = '/roll';
 
   const RollScreen({super.key});
 
   @override
+  State<RollScreen> createState() => _RollScreenState();
+}
+
+class _RollScreenState extends State<RollScreen> {
+  String? _precachedDiceId;
+
+  /// Warms the image cache for the active dice's faces once per dice. Guarded
+  /// by id so the repeated notifications during a roll don't re-trigger it,
+  /// and scheduled post-frame so precaching never runs during build.
+  void _maybePrecache(DiceGameProvider game) {
+    if (game.activeDice.id == _precachedDiceId) {
+      return;
+    }
+    _precachedDiceId = game.activeDice.id;
+    final faces = game.activeDice.faces;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        precacheDiceFaces(context, faces);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final game = context.watch<DiceGameProvider>();
+    _maybePrecache(game);
 
     return AppScaffold(
       appBar: AppAppBar(

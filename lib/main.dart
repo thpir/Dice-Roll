@@ -22,6 +22,9 @@ Future<void> main() async {
   final preferencesService = PreferencesService();
   await preferencesService.init();
   final imageStorageService = ImageStorageService();
+  // Cache the documents directory up front so stored image paths resolve
+  // synchronously on hot paths (e.g. the roll animation).
+  await imageStorageService.warmUp();
 
   final diceRepository = DiceRepository(
     hive: hiveService,
