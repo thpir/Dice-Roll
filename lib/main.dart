@@ -41,12 +41,12 @@ Future<void> main() async {
   );
   await diceManagementProvider.load();
 
-  // Game provider spins up next, resolving the previously-selected dice from
-  // the loaded list and falling back to the built-in dice when needed.
+  // Game provider spins up next, resolving the previously-selected tray from
+  // the loaded list and falling back to a single built-in dice when needed.
   final diceGameProvider = DiceGameProvider(
     management: diceManagementProvider,
-    getSelectedDiceId: GetSelectedDiceIdImpl(selectedDiceRepository),
-    setSelectedDiceId: SetSelectedDiceIdImpl(selectedDiceRepository),
+    getSelectedDiceIds: GetSelectedDiceIdsImpl(selectedDiceRepository),
+    setSelectedDiceIds: SetSelectedDiceIdsImpl(selectedDiceRepository),
     rollDice: RollDice(),
   );
   await diceGameProvider.loadInitial();
