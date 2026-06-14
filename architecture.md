@@ -1,5 +1,5 @@
 ## Project overview
-My Energy Desk is a Flutter application following Clean Architecture principles with a focus on separation of concerns and testability.
+Dice roll is a Flutter application following Clean Architecture principles with a focus on separation of concerns and testability.
 ## Architecture pattern
 The project follows **Clean Architecture** with three distinct layers:
 1. **Data layer**: responsible for data access and external dependencies;
